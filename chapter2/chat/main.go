@@ -11,6 +11,7 @@ import (
 	"trace"
 
 	"github.com/stretchr/gomniauth"
+	"github.com/stretchr/objx"
 
 	"github.com/stretchr/gomniauth/providers/facebook"
 	"github.com/stretchr/gomniauth/providers/github"
@@ -30,6 +31,12 @@ func (t *templateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		t.temp1 =
 			template.Must(template.ParseFiles(filepath.Join("templates", t.filename)))
 	})
+	data := map[string]interface{}{
+		"Host": r.Host,
+	}
+	if authCookie, err := r.Cookie("auth"); err == nil {
+		data["UserData"] = objx.MustFromBase64(authCookie.Value)
+	}
 	t.temp1.Execute(w, r)
 }
 
